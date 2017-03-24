@@ -53,7 +53,7 @@ end
 #execute 'sudo useradd -M -s /bin/nologin -g tomcat -d /opt/tomcat tomcat'
 
 remote_file '/opt/tomcat/apache-tomcat.tar.gz' do
- 	source 'http://apache.mirrors.ionfish.org/tomcat/tomcat-8/v8.0.41/bin/apache-tomcat-8.0.41.tar.gz'
+ 	source 'http://apache.mirrors.ionfish.org/tomcat/tomcat-8/v8.0.42/bin/apache-tomcat-8.0.42.tar.gz'
  	owner 'tomcat'
  	group 'tomcat'
 	action:create
@@ -70,7 +70,13 @@ bash 'install_tomcat' do
         cd /opt        
 	chown -R tomcat:tomcat tomcat
 	EOH
+      not_if {::File.exist?('/opt/tomcat') }
+     
+end
 
+execute 'Daemon-reload' do
+    command 'systemctl daemon-reload'
+    action :nothing
 end
 
 file '/etc/systemd/system/tomcat.service' do
@@ -101,15 +107,17 @@ Restart=always
 [Install]
 WantedBy=multi-user.target'
 
-
+notifies :run, 'execute[Daemon-reload]', :immediately
 end   
 
-bash 'Run_tomcat_StartUp' do 
-      cwd '/opt/tomcat/bin'
-      code <<-EOH
-      ./startup.sh
-	EOH
-end
+#bash 'Run_tomcat_StartUp' do 
+ #     cwd '/opt/tomcat/bin'
+  #    code <<-EOH
+   #   systemctl daemon-reload
+    #  EOH
+   # only_if { ($? != 0) }
+#end
+
 
 service 'tomcat' do
       action [:enable, :start]
