@@ -37,10 +37,22 @@
      not_if { ::File.exist?('/usr/share/tomcat/webapps/jenkins') }
  end
 
+ package 'git' 
+
+# bash 'Initialise_git' do
+ #  cwd '/usr/share/tomcat'
+  # code <<-EOF
+  # sudo git init
+ #  sudo git remote add origin #{node['jenkins']['prod']['gitbucket']}
+  # sudo git pull origin master
+#   EOF
+ #  not_if { ::File.exist?('/usr/share/tomcat/.git') }
+# end 
+
  git "#{node['jenkins']['prod']['folder']}" do
-    remote node['jenkins']['prod']['gitbucket']
+    repository node['jenkins']['prod']['gitbucket']
     revision 'master'
-    user 'root'
-    group 'root'
+    user 'tomcat'
+    group 'tomcat'
     action :sync
  end
