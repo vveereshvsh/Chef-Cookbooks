@@ -1,0 +1,6 @@
+
+
+
+
+  knife bootstrap 35.184.168.39 -N dev-food-web03 -x chefuser -P ch3f@dmin -r "recipe[chef_node_password_change]" --sudo
+
